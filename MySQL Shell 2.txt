@@ -1,0 +1,263 @@
+ MySQL  localhost:33060+ ssl  bank_system  SQL > CREATE DATABASE bank_system;
+Query OK, 1 row affected (0.0074 sec)
+ MySQL  localhost:33060+ ssl  bank_system  SQL > USE bank_system;
+Default schema set to `bank_system`.
+Fetching global names, object names from `bank_system` for auto-completion... Press ^C to stop.
+ MySQL  localhost:33060+ ssl  bank_system  SQL > CREATE TABLE customer_master (
+                                              ->     cust_no INT PRIMARY KEY,
+                                              ->     fname VARCHAR(50),
+                                              ->     lname VARCHAR(50)
+                                              -> );
+Query OK, 0 rows affected (0.0350 sec)
+ MySQL  localhost:33060+ ssl  bank_system  SQL > CREATE TABLE address_details (
+                                              ->     cust_no INT,
+                                              ->     add1 VARCHAR(100),
+                                              ->     add2 VARCHAR(100),
+                                              ->     state VARCHAR(50),
+                                              ->     city VARCHAR(50),
+                                              ->     pincode VARCHAR(10),
+                                              ->     FOREIGN KEY (cust_no) REFERENCES customer_master(cust_no)
+                                              -> );
+Query OK, 0 rows affected (0.0416 sec)
+ MySQL  localhost:33060+ ssl  bank_system  SQL > INSERT INTO customer_master VALUES
+                                              -> (1, 'xyz', 'pqr'),
+                                              -> (2, 'rahul', 'sharma');
+Query OK, 2 rows affected (0.0085 sec)
+
+Records: 2  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank_system  SQL > INSERT INTO address_details VALUES
+                                              -> (1, '123 Main Street', 'Apt 4B', 'Maharashtra', 'Pune', '411001'),
+                                              -> (2, '456 Hill Road', 'Suite 21', 'Delhi', 'New Delhi', '110001');
+Query OK, 2 rows affected (0.0066 sec)
+
+Records: 2  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank_system  SQL > SELECT a.add1, a.add2, a.state, a.city, a.pincode
+                                              -> FROM customer_master c
+                                              -> JOIN address_details a ON c.cust_no = a.cust_no
+                                              -> WHERE c.fname = 'xyz' AND c.lname = 'pqr';
++-----------------+--------+-------------+------+---------+
+| add1            | add2   | state       | city | pincode |
++-----------------+--------+-------------+------+---------+
+| 123 Main Street | Apt 4B | Maharashtra | Pune | 411001  |
++-----------------+--------+-------------+------+---------+
+1 row in set (0.0019 sec)
+ MySQL  localhost:33060+ ssl  bank_system  SQL > CREATE TABLE acc_fixdeposite_cust_details (
+                                              ->     cust_no INT,
+                                              ->     acc_fd_no INT
+                                              -> );
+Query OK, 0 rows affected (0.0396 sec)
+ MySQL  localhost:33060+ ssl  bank_system  SQL > CREATE TABLE fixdeposite_dets (
+                                              ->     fd_sr_no INT PRIMARY KEY,
+                                              ->     amt DECIMAL(10,2)
+                                              -> );
+Query OK, 0 rows affected (0.0318 sec)
+ MySQL  localhost:33060+ ssl  bank_system  SQL > INSERT INTO acc_fixdeposite_cust_details VALUES
+                                              -> (1, 101),
+                                              -> (2, 102);
+Query OK, 2 rows affected (0.0085 sec)
+
+Records: 2  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank_system  SQL > INSERT INTO fixdeposite_dets VALUES
+                                              -> (101, 6000),
+                                              -> (102, 4000);
+Query OK, 2 rows affected (0.0077 sec)
+
+Records: 2  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank_system  SQL > SELECT c.fname, c.lname, f.amt
+                                              -> FROM customer_master c
+                                              -> JOIN acc_fixdeposite_cust_details a ON c.cust_no = a.cust_no
+                                              -> JOIN fixdeposite_dets f ON a.acc_fd_no = f.fd_sr_no
+                                              -> WHERE f.amt > 5000;
++-------+-------+---------+
+| fname | lname | amt     |
++-------+-------+---------+
+| xyz   | pqr   | 6000.00 |
++-------+-------+---------+
+1 row in set (0.0020 sec)
+ MySQL  localhost:33060+ ssl  bank_system  SQL > CREATE TABLE emp_mstr (
+                                              ->     emp_no INT PRIMARY KEY,
+                                              ->     f_name VARCHAR(50),
+                                              ->     l_name VARCHAR(50),
+                                              ->     m_name VARCHAR(50),
+                                              ->     dept VARCHAR(50),
+                                              ->     desg VARCHAR(50),
+                                              ->     branch_no INT
+                                              -> );
+Query OK, 0 rows affected (0.0375 sec)
+ MySQL  localhost:33060+ ssl  bank_system  SQL > CREATE TABLE branch_master (
+                                              ->     branch_no INT PRIMARY KEY,
+                                              ->     branch_name VARCHAR(50)
+                                              -> );
+Query OK, 0 rows affected (0.0332 sec)
+ MySQL  localhost:33060+ ssl  bank_system  SQL > INSERT INTO branch_master VALUES
+                                              -> (1, 'Pune Branch'),
+                                              -> (2, 'Mumbai Branch');
+Query OK, 2 rows affected (0.0080 sec)
+
+Records: 2  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank_system  SQL > INSERT INTO emp_mstr VALUES
+                                              -> (1, 'Amit', 'Patil', 'Kumar', 'HR', 'Manager', 1),
+                                              -> (2, 'Ravi', 'Joshi', 'Ramesh', 'IT', 'Engineer', 2);
+Query OK, 2 rows affected (0.0081 sec)
+
+Records: 2  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank_system  SQL > SELECT e.emp_no, e.f_name, e.l_name, e.dept, e.desg, b.branch_name
+                                              -> FROM emp_mstr e
+                                              -> JOIN branch_master b ON e.branch_no = b.branch_no;
++--------+--------+--------+------+----------+---------------+
+| emp_no | f_name | l_name | dept | desg     | branch_name   |
++--------+--------+--------+------+----------+---------------+
+|      1 | Amit   | Patil  | HR   | Manager  | Pune Branch   |
+|      2 | Ravi   | Joshi  | IT   | Engineer | Mumbai Branch |
++--------+--------+--------+------+----------+---------------+
+2 rows in set (0.0016 sec)
+ MySQL  localhost:33060+ ssl  bank_system  SQL > CREATE TABLE emp_master (
+                                              ->     emp_no INT PRIMARY KEY,
+                                              ->     f_name VARCHAR(50),
+                                              ->     l_name VARCHAR(50),
+                                              ->     m_name VARCHAR(50),
+                                              ->     dept VARCHAR(50)
+                                              -> );
+Query OK, 0 rows affected (0.0342 sec)
+ MySQL  localhost:33060+ ssl  bank_system  SQL > CREATE TABLE contact_details (                                  CREATE TABLE contact_details (
+                                              ->     emp_no INT,
+
+                                              ->     cntc_type VARCHAR(50),
+                                              ->     cntc_data VARCHAR(100),
+                                              ->     FOREIGN KEY (emp_no) REFERENCES emp_master(emp_no)
+                                              -> );
+Query OK, 0 rows affected (0.0534 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > INSERT INTO emp_master VALUES
+                                         -> (1, 'Raj', 'Sharma', 'Kumar', 'Finance'),
+                                         -> (2, 'Sneha', 'Patil', 'A.', 'HR');
+Query OK, 2 rows affected (0.0078 sec)
+
+Records: 2  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank... SQL > INSERT INTO contact_details VALUES
+                                         -> (1, 'Email', 'raj.sharma@example.com'),
+                                         -> (2, 'Phone', '9999999999'),
+                                         -> (3, 'Email', 'unknown@example.com');
+ERROR: 1452: Cannot add or update a child row: a foreign key constraint fails (`bank_system`.`contact_details`, CONSTRAINT `contact_details_ibfk_1` FOREIGN KEY (`emp_no`) REFERENCES `emp_master` (`emp_no`))
+ MySQL  localhost:33060+ ssl  bank... SQL > SELECT e.emp_no, e.f_name, e.l_name, c.cntc_type, c.cntc_data
+                                         -> FROM emp_master e
+                                         -> LEFT JOIN contact_details c ON e.emp_no = c.emp_no;
++--------+--------+--------+-----------+-----------+
+| emp_no | f_name | l_name | cntc_type | cntc_data |
++--------+--------+--------+-----------+-----------+
+|      1 | Raj    | Sharma | NULL      | NULL      |
+|      2 | Sneha  | Patil  | NULL      | NULL      |
++--------+--------+--------+-----------+-----------+
+2 rows in set (0.0014 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > SELECT e.emp_no, e.f_name, e.l_name, c.cntc_type, c.cntc_data
+                                         -> FROM emp_master e
+                                         -> RIGHT JOIN contact_details c ON e.emp_no = c.emp_no;
+Empty set (0.0015 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > CREATE TABLE branch (
+                                         ->     branch_no INT PRIMARY KEY,
+                                         ->     branch_name VARCHAR(50),
+                                         ->     pincode VARCHAR(10)
+                                         -> );
+Query OK, 0 rows affected (0.0332 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > CREATE TABLE customer_master2 (
+                                         ->     cust_no INT PRIMARY KEY,
+                                         ->     fname VARCHAR(50),
+                                         ->     lname VARCHAR(50),
+                                         ->     branch_no INT
+                                         -> );
+Query OK, 0 rows affected (0.0456 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > CREATE TABLE address_details2 (
+                                         ->     cust_no INT,
+                                         ->     pincode VARCHAR(10)
+                                         -> );
+Query OK, 0 rows affected (0.0322 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > INSERT INTO branch VALUES
+                                         -> (1, 'Pune Branch', '411001'),
+                                         -> (2, 'Mumbai Branch', '400001');
+Query OK, 2 rows affected (0.0075 sec)
+
+Records: 2  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank... SQL > INSERT INTO customer_master2 VALUES
+                                         -> (1, 'Rahul', 'Deshmukh', 1),
+                                         -> (2, 'Priya', 'Kale', 2),
+                                         -> (3, 'Arun', 'Joshi', NULL);
+Query OK, 3 rows affected (0.0077 sec)
+
+Records: 3  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank... SQL > INSERT INTO address_details2 VALUES
+                                         -> (1, '411001'),
+                                         -> (2, '500001'),
+                                         -> (3, '600001');
+Query OK, 3 rows affected (0.0072 sec)
+
+Records: 3  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank... SQL > SELECT c.fname, c.lname, a.pincode
+                                         -> FROM customer_master2 c
+                                         -> JOIN address_details2 a ON c.cust_no = a.cust_no
+                                         -> WHERE a.pincode NOT IN (SELECT pincode FROM branch);
++-------+-------+---------+
+| fname | lname | pincode |
++-------+-------+---------+
+| Priya | Kale  | 500001  |
+| Arun  | Joshi | 600001  |
++-------+-------+---------+
+2 rows in set (0.0018 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > CREATE TABLE borrower (
+                                         ->     b_id INT PRIMARY KEY,
+                                         ->     b_name VARCHAR(50),
+                                         ->     loan_amt DECIMAL(10,2)
+                                         -> );
+Query OK, 0 rows affected (0.0334 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > CREATE TABLE depositor (
+                                         ->     d_id INT PRIMARY KEY,
+                                         ->     d_name VARCHAR(50),
+                                         ->     deposit_amt DECIMAL(10,2)
+                                         -> );
+Query OK, 0 rows affected (0.0333 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > INSERT INTO borrower VALUES
+                                         -> (1, 'Ravi', 5000),
+                                         -> (2, 'Sneha', 8000);
+Query OK, 2 rows affected (0.0085 sec)
+
+Records: 2  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank... SQL > INSERT INTO depositor VALUES
+                                         -> (1, 'Ravi', 2000),
+                                         -> (2, 'Sneha', 9000);
+Query OK, 2 rows affected (0.0072 sec)
+
+Records: 2  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank... SQL > CREATE VIEW vw_borrower AS
+                                         -> SELECT b_id, b_name FROM borrower;
+Query OK, 0 rows affected (0.0080 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > SELECT * FROM vw_borrower;
++------+--------+
+| b_id | b_name |
++------+--------+
+|    1 | Ravi   |
+|    2 | Sneha  |
++------+--------+
+2 rows in set (0.0019 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > INSERT INTO borrower VALUES (3, 'Arun', 3000);
+Query OK, 1 row affected (0.0033 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > INSERT INTO depositor VALUES (3, 'Arun', 5000);
+Query OK, 1 row affected (0.0035 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > UPDATE borrower SET b_name = 'Rajesh' WHERE b_name = 'Ravi';
+Query OK, 1 row affected (0.0059 sec)
+
+Rows matched: 1  Changed: 1  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank... SQL > UPDATE depositor SET d_name = 'Rajesh' WHERE d_name = 'Ravi';
+Query OK, 1 row affected (0.0042 sec)
+
+Rows matched: 1  Changed: 1  Warnings: 0
+ MySQL  localhost:33060+ ssl  bank... SQL > DELETE FROM borrower WHERE b_name = 'Sneha';
+Query OK, 1 row affected (0.0055 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > DELETE FROM depositor WHERE d_name = 'Sneha';
+Query OK, 1 row affected (0.0040 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL > SELECT * FROM vw_borrower;
++------+--------+
+| b_id | b_name |
++------+--------+
+|    1 | Rajesh |
+|    3 | Arun   |
++------+--------+
+2 rows in set (0.0007 sec)
+ MySQL  localhost:33060+ ssl  bank... SQL >
