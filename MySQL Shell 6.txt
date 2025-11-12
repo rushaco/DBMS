@@ -1,0 +1,41 @@
+ MySQL  localhost:33060+ ssl  borrower  SQL > CREATE DATABASE IF NOT EXISTS info;
+Query OK, 1 row affected (0.0093 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > USE info;
+Default schema set to `info`.
+Fetching global names, object names from `info` for auto-completion... Press ^C to stop.
+ MySQL  localhost:33060+ ssl  info  SQL > CREATE TABLE IF NOT EXISTS result (
+                                       ->     stud_RollNo INT PRIMARY KEY,
+                                       ->     stud_Name VARCHAR(50),
+                                       ->     stud_Dept VARCHAR(50)
+                                       -> );
+Query OK, 0 rows affected (0.0355 sec)
+ MySQL  localhost:33060+ ssl  info  SQL > INSERT INTO result (stud_RollNo, stud_Name, stud_Dept) VALUES (1, 'Alice', 'Computer');
+Query OK, 1 row affected (0.0074 sec)
+ MySQL  localhost:33060+ ssl  info  SQL > INSERT INTO result (stud_RollNo, stud_Name, stud_Dept) VALUES (2, 'Bob', 'Mechanical');
+Query OK, 1 row affected (0.0039 sec)
+ MySQL  localhost:33060+ ssl  info  SQL > INSERT INTO result (stud_RollNo, stud_Name, stud_Dept) VALUES (3, 'Charlie', 'Civil');
+Query OK, 1 row affected (0.0035 sec)
+ MySQL  localhost:33060+ ssl  info  SQL > SELECT * FROM result;
++-------------+-----------+------------+
+| stud_RollNo | stud_Name | stud_Dept  |
++-------------+-----------+------------+
+|           1 | Alice     | Computer   |
+|           2 | Bob       | Mechanical |
+|           3 | Charlie   | Civil      |
++-------------+-----------+------------+
+3 rows in set (0.0008 sec)
+ MySQL  localhost:33060+ ssl  info  SQL > -- Example: Change Bob's department
+Query OK, 0 rows affected (0.0016 sec)
+ MySQL  localhost:33060+ ssl  info  SQL > UPDATE result SET stud_Dept = 'Electronics' WHERE stud_RollNo = 2;
+Query OK, 1 row affected (0.0056 sec)
+
+Rows matched: 1  Changed: 1  Warnings: 0
+ MySQL  localhost:33060+ ssl  info  SQL > -- Example: Delete Charlie's record
+Query OK, 0 rows affected (0.0007 sec)
+ MySQL  localhost:33060+ ssl  info  SQL > DELETE FROM result WHERE stud_RollNo = 3;
+Query OK, 1 row affected (0.0040 sec)
+ MySQL  localhost:33060+ ssl  info  SQL > DROP TABLE result;
+Query OK, 0 rows affected (0.0192 sec)
+ MySQL  localhost:33060+ ssl  info  SQL > DROP DATABASE info;
+Query OK, 0 rows affected (0.0069 sec)
+ MySQL  localhost:33060+ ssl  info  SQL >

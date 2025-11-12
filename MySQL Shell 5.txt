@@ -1,0 +1,103 @@
+ MySQL  localhost:33060+ ssl  cursor  SQL > -- 1. Create Database borrower;
+Query OK, 0 rows affected (0.0009 sec)
+
+ MySQL  localhost:33060+ ssl  cursor  SQL > USE borrower;
+Default schema set to `borrower`.
+Fetching global names, object names from `borrower` for auto-completion... Press ^C to stop.
+ MySQL  localhost:33060+ ssl  borrower  SQL > -- 2. Create Old Roll Call Table
+Query OK, 0 rows affected (0.0006 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > CREATE TABLE IF NOT EXISTS O_Roll_Call (
+                                           ->     Roll_No INT PRIMARY KEY,
+                                           ->     Name VARCHAR(100)
+                                           -> );
+Query OK, 0 rows affected (0.0314 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > -- 3. Create New Roll Call Table
+Query OK, 0 rows affected (0.0008 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > CREATE TABLE IF NOT EXISTS N_Roll_Call (
+                                           ->     Roll_No INT,
+                                           ->     Name VARCHAR(100)
+                                           -> );
+Query OK, 0 rows affected (0.0329 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > -- 4. Insert sample data
+Query OK, 0 rows affected (0.0006 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > -- Old table has one record
+Query OK, 0 rows affected (0.0006 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > INSERT INTO O_Roll_Call (Roll_No, Name) VALUES (101, 'Alice');
+Query OK, 1 row affected (0.0074 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > -- New table has some new and some duplicate
+Query OK, 0 rows affected (0.0012 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > INSERT INTO N_Roll_Call (Roll_No, Name) VALUES
+                                           -> (101, 'Alice'),   -- duplicate
+                                           -> (102, 'Bob'),     -- new
+                                           -> (103, 'Charlie'); -- new
+Query OK, 3 rows affected (0.0064 sec)
+
+Records: 3  Duplicates: 0  Warnings: 0
+Query OK, 0 rows affected (0.0005 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > -- 5. Create stored procedure using explicit cursor
+Query OK, 0 rows affected (0.0009 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > DELIMITER $$
+ MySQL  localhost:33060+ ssl  borrower  SQL > CREATE PROCEDURE MergeRollCalls()
+                                           -> BEGIN
+                                           ->     DECLARE v_roll INT;
+                                           ->     DECLARE v_name VARCHAR(100);
+                                           ->     DECLARE v_exists INT DEFAULT 0;
+                                           ->     DECLARE done INT DEFAULT 0;
+                                           ->
+                                           ->     -- Cursor for new roll call table
+                                           ->     DECLARE cur CURSOR FOR SELECT Roll_No, Name FROM N_Roll_Call;
+                                           ->     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+                                           ->
+                                           ->     OPEN cur;
+                                           ->
+                                           ->     read_loop: LOOP
+                                           ->         FETCH cur INTO v_roll, v_name;
+                                           ->
+                                           ->         IF done THEN
+                                           ->             LEAVE read_loop;
+                                           ->         END IF;
+                                           ->
+                                           ->         -- Check if Roll_No already exists in O_Roll_Call
+                                           ->         SELECT COUNT(*) INTO v_exists FROM O_Roll_Call WHERE Roll_No = v_roll;
+                                           ->
+                                           ->         IF v_exists = 0 THEN
+                                           ->             -- Insert new record
+                                           ->             INSERT INTO O_Roll_Call (Roll_No, Name) VALUES (v_roll, v_name);
+                                           ->             SELECT CONCAT('Inserted: ', v_roll, ' - ', v_name) AS Message;
+
+                                           ->         ELSE
+                                           ->             SELECT CONCAT('Skipped (Duplicate): ', v_roll) AS Message;
+                                           ->         END IF;
+                                           ->
+                                           ->     END LOOP;
+                                           ->
+                                           ->     CLOSE cur;
+                                           -> END$$
+Query OK, 0 rows affected (0.0063 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > DELIMITER ;
+ MySQL  localhost:33060+ ssl  borrower  SQL > -- 6. Call the procedure to merge data
+Query OK, 0 rows affected (0.0007 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL > CALL MergeRollCalls();
++--------------------------+
+| Message                  |
++--------------------------+
+| Skipped (Duplicate): 101 |
++--------------------------+
+1 row in set (0.0094 sec)
+
++---------------------+
+| Message             |
++---------------------+
+| Inserted: 102 - Bob |
++---------------------+
+1 row in set (0.0094 sec)
+
++-------------------------+
+| Message                 |
++-------------------------+
+| Inserted: 103 - Charlie |
++-------------------------+
+1 row in set (0.0094 sec)
+
+Query OK, 0 rows affected (0.0094 sec)
+ MySQL  localhost:33060+ ssl  borrower  SQL >

@@ -1,0 +1,147 @@
+ MySQL  localhost:33060+ ssl  SQL > CREATE DATABASE DYPCOE;
+Query OK, 1 row affected (0.0087 sec)
+ MySQL  localhost:33060+ ssl  SQL > USE DYPCOE;
+Default schema set to `DYPCOE`.
+Fetching global names, object names from `dypcoe` for auto-completion... Press ^C to stop.
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > CREATE TABLE Teachers (
+                                         ->     Tname VARCHAR(50),
+                                         ->     dno INT,
+                                         ->     dname VARCHAR(50),
+                                         ->     experience INT,
+                                         ->     salary DECIMAL(10,2),
+                                         ->     date_of_joining DATE
+                                         -> );
+Query OK, 0 rows affected (0.0431 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > CREATE TABLE Students (
+                                         ->     Sname VARCHAR(50),
+                                         ->     roll_no INT PRIMARY KEY,
+                                         ->     class VARCHAR(10)
+                                         -> );
+Query OK, 0 rows affected (0.0320 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > CREATE TABLE Department (
+                                         ->     dno INT PRIMARY KEY,
+                                         ->     dname VARCHAR(50)
+                                         -> );
+Query OK, 0 rows affected (0.0337 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining) VALUES
+
+                                         -> ('Praveen', 1, 'Computer', 5, 12000, '2020-06-15'),
+                                         -> ('Rohit', 2, 'IT', 3, 15000, '2021-01-10'),
+                                         -> ('Meena', 3, 'E&TC', 8, 11000, '2018-09-05'),
+                                         -> ('Sita', 4, 'Computer', 6, 13000, '2019-03-20');
+Query OK, 4 rows affected (0.0132 sec)
+
+Records: 4  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > INSERT INTO Students (Sname, roll_no, class) VALUES
+                                         -> ('Amit', 1, 'FY'),
+                                         -> ('xyz', 2, 'SY'),
+                                         -> ('Neha', 3, 'TY');
+Query OK, 3 rows affected (0.0080 sec)
+
+Records: 3  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > SELECT * FROM Teachers;
++---------+-----+----------+------------+----------+-----------------+
+| Tname   | dno | dname    | experience | salary   | date_of_joining |
++---------+-----+----------+------------+----------+-----------------+
+| Praveen |   1 | Computer |          5 | 12000.00 | 2020-06-15      |
+| Rohit   |   2 | IT       |          3 | 15000.00 | 2021-01-10      |
+| Meena   |   3 | E&TC     |          8 | 11000.00 | 2018-09-05      |
+| Sita    |   4 | Computer |          6 | 13000.00 | 2019-03-20      |
++---------+-----+----------+------------+----------+-----------------+
+4 rows in set (0.0015 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > SELECT * FROM Teachers
+                                         -> WHERE dname = 'Computer';
++---------+-----+----------+------------+----------+-----------------+
+| Tname   | dno | dname    | experience | salary   | date_of_joining |
++---------+-----+----------+------------+----------+-----------------+
+| Praveen |   1 | Computer |          5 | 12000.00 | 2020-06-15      |
+| Sita    |   4 | Computer |          6 | 13000.00 | 2019-03-20      |
++---------+-----+----------+------------+----------+-----------------+
+2 rows in set (0.0012 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > SELECT * FROM Teachers
+                                         -> WHERE dname IN ('Computer', 'IT', 'E&TC');
++---------+-----+----------+------------+----------+-----------------+
+| Tname   | dno | dname    | experience | salary   | date_of_joining |
++---------+-----+----------+------------+----------+-----------------+
+| Praveen |   1 | Computer |          5 | 12000.00 | 2020-06-15      |
+| Rohit   |   2 | IT       |          3 | 15000.00 | 2021-01-10      |
+| Meena   |   3 | E&TC     |          8 | 11000.00 | 2018-09-05      |
+| Sita    |   4 | Computer |          6 | 13000.00 | 2019-03-20      |
++---------+-----+----------+------------+----------+-----------------+
+4 rows in set (0.0013 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > SELECT * FROM Teachers
+                                         -> WHERE dname IN ('Computer', 'IT', 'E&TC') AND salary >= 10000;
++---------+-----+----------+------------+----------+-----------------+
+| Tname   | dno | dname    | experience | salary   | date_of_joining |
++---------+-----+----------+------------+----------+-----------------+
+| Praveen |   1 | Computer |          5 | 12000.00 | 2020-06-15      |
+| Rohit   |   2 | IT       |          3 | 15000.00 | 2021-01-10      |
+| Meena   |   3 | E&TC     |          8 | 11000.00 | 2018-09-05      |
+| Sita    |   4 | Computer |          6 | 13000.00 | 2019-03-20      |
++---------+-----+----------+------------+----------+-----------------+
+4 rows in set (0.0014 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > SELECT * FROM Students
+                                         -> WHERE roll_no = 2 OR Sname = 'xyz';
++-------+---------+-------+
+| Sname | roll_no | class |
++-------+---------+-------+
+| xyz   |       2 | SY    |
++-------+---------+-------+
+1 row in set (0.0013 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > -- Update if exists
+Query OK, 0 rows affected (0.0009 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > UPDATE Teachers
+                                         -> SET experience = 10
+                                         -> WHERE Tname = 'Praveen';
+Query OK, 1 row affected (0.0059 sec)
+
+Rows matched: 1  Changed: 1  Warnings: 0
+ MySQL  localhost:33060+ ssl  dypcoe  SQL >
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > -- Insert if not exists
+Query OK, 0 rows affected (0.0007 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining)
+                                         -> SELECT 'Praveen', 1, 'Computer', 10, 12000, '2020-06-15'
+                                         -> WHERE NOT EXISTS (SELECT * FROM Teachers WHERE Tname = 'Praveen');
+Query OK, 0 rows affected (0.0017 sec)
+
+Records: 0  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > UPDATE Teachers
+                                         -> SET dname = 'COMP'
+                                         -> WHERE dname = 'IT';
+Query OK, 1 row affected (0.0057 sec)
+
+Rows matched: 1  Changed: 1  Warnings: 0
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > SELECT Tname, experience FROM Teachers;
++---------+------------+
+| Tname   | experience |
++---------+------------+
+| Praveen |         10 |
+| Rohit   |          3 |
+| Meena   |          8 |
+| Sita    |          6 |
++---------+------------+
+4 rows in set (0.0010 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > INSERT INTO Department (dno, dname) VALUES (5, 'Mechanical');
+Query OK, 1 row affected (0.0075 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > UPDATE Teachers
+                                         -> SET dname = 'IT'
+                                         -> WHERE Tname = 'Praveen';
+Query OK, 1 row affected (0.0060 sec)
+
+Rows matched: 1  Changed: 1  Warnings: 0
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > DELETE FROM Teachers
+
+                                         -> WHERE dname = 'IT';
+Query OK, 1 row affected (0.0045 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > SELECT * FROM Teachers
+                                         -> ORDER BY Tname ASC
+                                         -> LIMIT 3;
++-------+-----+----------+------------+----------+-----------------+
+| Tname | dno | dname    | experience | salary   | date_of_joining |
++-------+-----+----------+------------+----------+-----------------+
+| Meena |   3 | E&TC     |          8 | 11000.00 | 2018-09-05      |
+| Rohit |   2 | COMP     |          3 | 15000.00 | 2021-01-10      |
+| Sita  |   4 | Computer |          6 | 13000.00 | 2019-03-20      |
++-------+-----+----------+------------+----------+-----------------+
+3 rows in set (0.0027 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL >

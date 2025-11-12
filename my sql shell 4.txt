@@ -1,0 +1,113 @@
+ MySQL  localhost:33060+ ssl  SQL > -- 1. Create Database DYPCOE;
+Query OK, 0 rows affected (0.0009 sec)
+
+ MySQL  localhost:33060+ ssl  SQL > USE DYPCOE;
+Default schema set to `DYPCOE`.
+Fetching global names, object names from `dypcoe` for auto-completion... Press ^C to stop.
+ MySQL  localhost:33060+ ssl  dypcoe  SQL >
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > -- 2. Create Borrower Table
+Query OK, 0 rows affected (0.0007 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > CREATE TABLE IF NOT EXISTS Borrower (
+                                         ->     Roll_no INT,
+                                         ->     Name VARCHAR(100),
+                                         ->     Date_of_Issue DATE,
+                                         ->     Name_of_Book VARCHAR(100),
+                                         ->     Status CHAR(1) DEFAULT '1', -- '1' = issued, 'R' = returned
+                                         ->     PRIMARY KEY (Roll_no, Name_of_Book)
+                                         -> );
+Query OK, 0 rows affected (0.0376 sec)
+  MySQL  localhost:33060+ ssl  dypcoe  SQL > -- 3. Create Fine Table
+Query OK, 0 rows affected (0.0007 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > CREATE TABLE IF NOT EXISTS Fine (
+                                         ->     Roll_no INT,
+                                         ->     Date DATE,
+                                         ->     Amt DECIMAL(10,2)
+                                         -> );
+Query OK, 0 rows affected (0.0324 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > -- 4. Insert sample data into Borrower
+Query OK, 0 rows affected (0.0005 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > INSERT INTO Borrower (Roll_no, Name, Date_of_Issue, Name_of_Book, Status) VALUES
+                                         -> (101, 'Priya', '2025-07-01', 'Database Systems', '1'),
+                                         -> (102, 'Rahul', '2025-08-05', 'Operating Systems', '1'),
+                                         -> (103, 'Neha',  '2025-08-20', 'Computer Networks', '1');
+Query OK, 3 rows affected (0.0079 sec)
+
+Records: 3  Duplicates: 0  Warnings: 0
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > -- 5. Create Stored Procedure
+Query OK, 0 rows affected (0.0003 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > DELIMITER $$
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > CREATE PROCEDURE ProcessReturn(
+                                         ->     IN input_Roll_no INT,
+                                         ->     IN input_Name_of_Book VARCHAR(100)
+                                         -> )
+                                         -> BEGIN
+                                         ->     DECLARE v_Date_of_Issue DATE;
+                                         ->     DECLARE v_Days INT;
+                                         ->     DECLARE v_Fine_Amt DECIMAL(10,2) DEFAULT 0;
+                                         ->
+                                         ->     DECLARE EXIT HANDLER FOR SQLEXCEPTION
+                                         ->     BEGIN
+                                         ->         ROLLBACK;
+                                         ->         SELECT 'An error occurred. Please check your input or system state.' AS Error;
+                                         ->     END;
+                                         ->
+                                         ->     START TRANSACTION;
+                                         ->
+                                         ->     -- Fetch date of issue
+                                         ->     SELECT Date_of_Issue INTO v_Date_of_Issue
+                                         ->     FROM Borrower
+                                         ->     WHERE Roll_no = input_Roll_no
+                                         ->       AND Name_of_Book = input_Name_of_Book
+                                         ->       AND Status = '1'
+                                         ->     FOR UPDATE;
+                                         ->
+                                         ->     -- Check if book is issued
+                                         ->     IF v_Date_of_Issue IS NULL THEN
+                                         ->         ROLLBACK;
+                                         ->         SIGNAL SQLSTATE '45000'
+                                         ->             SET MESSAGE_TEXT = 'No active issue found for this Roll_no / Book (already returned or wrong details)';
+                                         ->     END IF;
+                                         ->
+                                         ->     -- Calculate days
+                                         ->     SET v_Days = DATEDIFF(CURDATE(), v_Date_of_Issue);
+                                         ->
+                                         ->     -- Calculate fine
+                                         ->     IF v_Days > 30 THEN
+                                         ->         SET v_Fine_Amt = (30 * 5) + ((v_Days - 30) * 50); -- First 30 days @5, remaining @50
+                                         ->     ELSEIF v_Days > 15 THEN
+                                         ->         SET v_Fine_Amt = v_Days * 5; -- 15-30 days @5
+                                         ->     ELSE
+                                         ->         SET v_Fine_Amt = 0; -- <=15 days no fine
+                                         ->     END IF;
+                                         ->
+                                         ->     -- Insert fine if applicable
+                                         ->     IF v_Fine_Amt > 0 THEN
+                                         ->         INSERT INTO Fine (Roll_no, Date, Amt)
+                                         ->         VALUES (input_Roll_no, CURDATE(), v_Fine_Amt);
+                                         ->     END IF;
+                                         ->
+                                         ->     -- Update status
+                                         ->     UPDATE Borrower
+                                         ->     SET Status = 'R'
+                                         ->     WHERE Roll_no = input_Roll_no AND Name_of_Book = input_Name_of_Book;
+                                         ->
+                                         ->     COMMIT;
+                                         ->
+                                         ->     SELECT CONCAT('Book returned successfully. Fine: ₹', FORMAT(v_Fine_Amt,2)) AS Message;
+                                         -> END$$
+Query OK, 0 rows affected (0.0333 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > DELIMITER ;
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > -- 6. Call the stored procedure
+Query OK, 0 rows affected (0.0009 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > -- Example: Returning Priya's book
+Query OK, 0 rows affected (0.0008 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL > CALL ProcessReturn(101, 'Database Systems');
++---------------------------------------------+
+| Message                                     |
++---------------------------------------------+
+| Book returned successfully. Fine: ₹3,800.00 |
++---------------------------------------------+
+1 row in set (0.0169 sec)
+
+Query OK, 0 rows affected (0.0169 sec)
+ MySQL  localhost:33060+ ssl  dypcoe  SQL >
