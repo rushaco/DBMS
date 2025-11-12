@@ -1,0 +1,255 @@
+ MySQL  localhost:33060+ ssl  SQL > CREATE DATABASE bank_db;
+Query OK, 1 row affected (0.0154 sec)
+ MySQL  localhost:33060+ ssl  SQL > USE bank_db;
+Default schema set to `bank_db`.
+Fetching global names, object names from `bank_db` for auto-completion... Press ^C to stop.
+ MySQL  localhost:33060+ ssl  bank_db  SQL > -- Branch table
+Query OK, 0 rows affected (0.0006 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > CREATE TABLE branch (
+                                          ->     branch_name VARCHAR(50) PRIMARY KEY,
+                                          ->     branch_city VARCHAR(50) NOT NULL,
+                                          ->     assets DECIMAL(15,2) CHECK (assets >= 0)
+                                          -> );
+Query OK, 0 rows affected (0.0734 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL >
+ MySQL  localhost:33060+ ssl  bank_db  SQL > -- Customer table
+Query OK, 0 rows affected (0.0009 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > CREATE TABLE customer (
+                                          ->     cust_name VARCHAR(50) PRIMARY KEY,
+                                          ->     cust_street VARCHAR(100),
+                                          ->     cust_city VARCHAR(50)
+                                          -> );
+Query OK, 0 rows affected (0.0326 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL >
+ MySQL  localhost:33060+ ssl  bank_db  SQL > -- Account table
+Query OK, 0 rows affected (0.0007 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > CREATE TABLE account (
+                                          ->     acc_no INT PRIMARY KEY,
+                                          ->     branch_name VARCHAR(50),
+                                          ->     balance DECIMAL(15,2) CHECK (balance >= 0),
+                                          ->     FOREIGN KEY (branch_name) REFERENCES branch(branch_name)
+                                          -> );
+Query OK, 0 rows affected (0.0429 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL >
+ MySQL  localhost:33060+ ssl  bank_db  SQL > -- Depositor table
+Query OK, 0 rows affected (0.0007 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > CREATE TABLE depositor (
+                                          ->     cust_name VARCHAR(50),
+                                          ->     acc_no INT,
+                                          ->     PRIMARY KEY (cust_name, acc_no),
+                                          ->     FOREIGN KEY (cust_name) REFERENCES customer(cust_name),
+                                          ->     FOREIGN KEY (acc_no) REFERENCES account(acc_no)
+                                          -> );
+Query OK, 0 rows affected (0.0439 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL >
+ MySQL  localhost:33060+ ssl  bank_db  SQL > -- Loan table
+Query OK, 0 rows affected (0.0007 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > CREATE TABLE loan (
+                                          ->     loan_no INT PRIMARY KEY,
+                                          ->     branch_name VARCHAR(50),
+                                          ->     amount DECIMAL(15,2) CHECK (amount > 0),
+                                          ->     FOREIGN KEY (branch_name) REFERENCES branch(branch_name)
+                                          -> );
+Query OK, 0 rows affected (0.0442 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL >
+ MySQL  localhost:33060+ ssl  bank_db  SQL > -- Borrower table
+Query OK, 0 rows affected (0.0007 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > CREATE TABLE borrower (
+                                          ->     cust_name VARCHAR(50),
+                                          ->     loan_no INT,
+                                          ->     PRIMARY KEY (cust_name, loan_no),
+                                          ->     FOREIGN KEY (cust_name) REFERENCES customer(cust_name),
+                                          ->     FOREIGN KEY (loan_no) REFERENCES loan(loan_no)
+                                          -> );
+Query OK, 0 rows affected (0.0483 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > -- Branches
+Query OK, 0 rows affected (0.0010 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO branch VALUES ('Akurdi', 'Pune', 2500000);
+Query OK, 1 row affected (0.0221 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO branch VALUES ('Nigdi', 'Pune', 1800000);
+Query OK, 1 row affected (0.0030 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO branch VALUES ('Deccan', 'Pune', 2200000);
+Query OK, 1 row affected (0.0029 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL >
+ MySQL  localhost:33060+ ssl  bank_db  SQL > -- Customers
+Query OK, 0 rows affected (0.0003 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO customer VALUES ('Rutuja', 'MG Road', 'Pune');
+Query OK, 1 row affected (0.0056 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO customer VALUES ('Sneha', 'Main Street', 'Pune');
+Query OK, 1 row affected (0.0031 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO customer VALUES ('Tejas', 'Station Rd', 'Mumbai');
+Query OK, 1 row affected (0.0027 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO customer VALUES ('Omkar', 'Market Rd', 'Pune');
+Query OK, 1 row affected (0.0021 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL >
+ MySQL  localhost:33060+ ssl  bank_db  SQL > -- Accounts
+Query OK, 0 rows affected (0.0004 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO account VALUES (101, 'Akurdi', 15000);
+Query OK, 1 row affected (0.0067 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO account VALUES (102, 'Nigdi', 8000);
+Query OK, 1 row affected (0.0041 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO account VALUES (103, 'Akurdi', 25000);
+Query OK, 1 row affected (0.0037 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO account VALUES (104, 'Deccan', 12000);
+Query OK, 1 row affected (0.0039 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL >
+ MySQL  localhost:33060+ ssl  bank_db  SQL > -- Depositors
+Query OK, 0 rows affected (0.0007 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO depositor VALUES ('Rutuja', 101);
+Query OK, 1 row affected (0.0062 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO depositor VALUES ('Sneha', 103);
+Query OK, 1 row affected (0.0045 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO depositor VALUES ('Omkar', 102);
+Query OK, 1 row affected (0.0043 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL >
+ MySQL  localhost:33060+ ssl  bank_db  SQL > -- Loans
+Query OK, 0 rows affected (0.0006 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO loan VALUES (201, 'Akurdi', 18000);
+Query OK, 1 row affected (0.0069 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO loan VALUES (202, 'Nigdi', 9000);
+Query OK, 1 row affected (0.0041 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO loan VALUES (203, 'Akurdi', 25000);
+Query OK, 1 row affected (0.0042 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL >
+ MySQL  localhost:33060+ ssl  bank_db  SQL > -- Borrowers
+Query OK, 0 rows affected (0.0007 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO borrower VALUES ('Rutuja', 201);
+Query OK, 1 row affected (0.0065 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO borrower VALUES ('Tejas', 202);
+Query OK, 1 row affected (0.0044 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > INSERT INTO borrower VALUES ('Sneha', 203);
+Query OK, 1 row affected (0.0040 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT DISTINCT branch_name FROM loan;
++-------------+
+| branch_name |
++-------------+
+| Akurdi      |
+| Nigdi       |
++-------------+
+2 rows in set (0.0016 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT loan_no FROM loan WHERE branch_name='Akurdi' AND amount > 12000;
++---------+
+| loan_no |
++---------+
+|     201 |
+|     203 |
++---------+
+2 rows in set (0.0037 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT b.cust_name, b.loan_no, l.amount
+                                          -> FROM borrower b JOIN loan l ON b.loan_no = l.loan_no;
++-----------+---------+----------+
+| cust_name | loan_no | amount   |
++-----------+---------+----------+
+| Rutuja    |     201 | 18000.00 |
+| Tejas     |     202 |  9000.00 |
+| Sneha     |     203 | 25000.00 |
++-----------+---------+----------+
+3 rows in set (0.0044 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT DISTINCT b.cust_name
+                                          -> FROM borrower b JOIN loan l ON b.loan_no = l.loan_no
+                                          -> WHERE l.branch_name = 'Akurdi'
+                                          -> ORDER BY b.cust_name ASC;
++-----------+
+| cust_name |
++-----------+
+| Rutuja    |
+| Sneha     |
++-----------+
+2 rows in set (0.0019 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT cust_name FROM depositor
+                                          -> UNION
+                                          -> SELECT cust_name FROM borrower;
++-----------+
+| cust_name |
++-----------+
+| Rutuja    |
+| Omkar     |
+| Sneha     |
+| Tejas     |
++-----------+
+4 rows in set (0.0042 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT d.cust_name
+                                          -> FROM depositor d
+                                          -> INNER JOIN borrower b ON d.cust_name = b.cust_name;
++-----------+
+| cust_name |
++-----------+
+| Rutuja    |
+| Sneha     |
++-----------+
+2 rows in set (0.0012 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT cust_name
+                                          -> FROM depositor
+                                          -> WHERE cust_name NOT IN (SELECT cust_name FROM borrower);
++-----------+
+| cust_name |
++-----------+
+| Omkar     |
++-----------+
+1 row in set (0.0022 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT AVG(balance) AS avg_balance
+                                          -> FROM account
+                                          -> WHERE branch_name = 'Akurdi';
++--------------+
+| avg_balance  |
++--------------+
+| 20000.000000 |
++--------------+
+1 row in set (0.0041 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT branch_name, AVG(balance) AS avg_balance
+                                          -> FROM account
+                                          -> GROUP BY branch_name;
++-------------+--------------+
+| branch_name | avg_balance  |
++-------------+--------------+
+| Akurdi      | 20000.000000 |
+| Deccan      | 12000.000000 |
+| Nigdi       |  8000.000000 |
++-------------+--------------+
+3 rows in set (0.0013 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT a.branch_name, COUNT(d.cust_name) AS total_depositors
+                                          -> FROM account a JOIN depositor d ON a.acc_no = d.acc_no
+                                          -> GROUP BY a.branch_name;
++-------------+------------------+
+| branch_name | total_depositors |
++-------------+------------------+
+| Akurdi      |                2 |
+| Nigdi       |                1 |
++-------------+------------------+
+2 rows in set (0.0015 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT branch_name
+                                          -> FROM account
+                                          -> GROUP BY branch_name
+                                          -> HAVING AVG(balance) > 12000;
++-------------+
+| branch_name |
++-------------+
+| Akurdi      |
++-------------+
+1 row in set (0.0013 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT COUNT(*) AS total_customers FROM customer;
++-----------------+
+| total_customers |
++-----------------+
+|               4 |
++-----------------+
+1 row in set (0.0160 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > SELECT SUM(amount) AS total_loan FROM loan;
++------------+
+| total_loan |
++------------+
+|   52000.00 |
++------------+
+1 row in set (0.0010 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > DELETE FROM loan WHERE amount BETWEEN 1300 AND 1500;
+Query OK, 0 rows affected (0.0022 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > DELETE FROM branch WHERE branch_city = 'Nigdi';
+Query OK, 0 rows affected (0.0007 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > CREATE VIEW cust AS SELECT * FROM customer;
+Query OK, 0 rows affected (0.0228 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL > CREATE TABLE student (
+                                          ->     roll_no INT AUTO_INCREMENT PRIMARY KEY,
+                                          ->     name VARCHAR(50)
+                                          -> );
+Query OK, 0 rows affected (0.0739 sec)
+ MySQL  localhost:33060+ ssl  bank_db  SQL >
